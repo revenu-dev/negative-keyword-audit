@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Negative Keyword Audit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Open+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #fbf7f4;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .container {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(49, 119, 115, 0.1);
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    h1 {
+      font-family: 'Montserrat', sans-serif;
+      color: #317773;
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      font-family: 'Montserrat', sans-serif;
+      color: #333;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+
+    label .optional {
+      color: #999;
+      font-weight: 400;
+    }
+
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input[type="text"]:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #317773;
+      box-shadow: 0 0 0 3px rgba(49, 119, 115, 0.1);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .file-upload {
+      border: 2px dashed #ddd;
+      border-radius: 8px;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background-color 0.2s;
+    }
+
+    .file-upload:hover {
+      border-color: #317773;
+      background-color: rgba(49, 119, 115, 0.02);
+    }
+
+    .file-upload.dragover {
+      border-color: #317773;
+      background-color: rgba(49, 119, 115, 0.05);
+    }
+
+    .file-upload.has-file {
+      border-color: #317773;
+      border-style: solid;
+      background-color: rgba(49, 119, 115, 0.05);
+    }
+
+    .file-upload-icon {
+      color: #317773;
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .file-upload-text {
+      color: #666;
+      font-size: 0.875rem;
+    }
+
+    .file-upload-text strong {
+      color: #317773;
+    }
+
+    .file-name {
+      color: #317773;
+      font-weight: 500;
+      font-size: 0.9rem;
+      word-break: break-all;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 0.875rem 1.5rem;
+      background-color: #317773;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #285f5c;
+    }
+
+    button[type="submit"]:active {
+      transform: scale(0.98);
+    }
+
+    button[type="submit"]:disabled {
+      background-color: #999;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .status {
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      display: none;
+    }
+
+    .status.success {
+      display: block;
+      background-color: rgba(49, 119, 115, 0.1);
+      color: #317773;
+    }
+
+    .status.error {
+      display: block;
+      background-color: #fef2f2;
+      color: #dc2626;
+    }
+
+    .webhook-config {
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid #eee;
+    }
+
+    .webhook-config input {
+      font-family: monospace;
+      font-size: 0.8rem;
+    }
+
+    .advanced-section {
+      margin-bottom: 1.5rem;
+      border: 1px solid #eee;
+      border-radius: 8px;
+    }
+
+    .advanced-section summary {
+      padding: 0.875rem 1rem;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #666;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .advanced-section summary:hover {
+      color: #317773;
+    }
+
+    .advanced-section[open] summary {
+      border-bottom: 1px solid #eee;
+    }
+
+    .advanced-content {
+      padding: 1rem;
+    }
+
+    .advanced-content .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .advanced-content input[type="text"] {
+      font-family: monospace;
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Negative Keyword Audit</h1>
+    <p class="subtitle">Upload exclusion list for competitor term review</p>
+
+    <form id="auditForm">
+      <div class="form-group">
+        <label for="clientName">Client Name</label>
+        <input type="text" id="clientName" name="clientName" placeholder="e.g. Acme Corp" required>
+      </div>
+
+      <div class="form-group">
+        <label for="csvFile">Negative Keyword List (CSV)</label>
+        <div class="file-upload" id="fileUploadArea">
+          <div class="file-upload-icon">↑</div>
+          <div class="file-upload-text">
+            <strong>Click to upload</strong> or drag and drop<br>
+            CSV exported from Google Ads
+          </div>
+        </div>
+        <input type="file" id="csvFile" name="csvFile" accept=".csv" required>
+      </div>
+
+      <details class="advanced-section">
+        <summary>I know what I'm doing</summary>
+        <div class="advanced-content">
+          <div class="form-group">
+            <label for="instructions">Additional Instructions</label>
+            <textarea id="instructions" name="instructions" placeholder="e.g. Pay special attention to HR software competitors..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="webhookUrl">Relay Webhook URL</label>
+            <input type="text" id="webhookUrl" name="webhookUrl" value="https://hook.relay.app/api/v1/playbook/cmk3tf70802u10pm57f2x9nn9/trigger/bPI5reI8DFp5V2fQe1e8lw">
+          </div>
+        </div>
+      </details>
+
+      <button type="submit" id="submitBtn">Submit for Audit</button>
+
+      <div class="status" id="status"></div>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById('auditForm');
+    const fileInput = document.getElementById('csvFile');
+    const fileUploadArea = document.getElementById('fileUploadArea');
+    const submitBtn = document.getElementById('submitBtn');
+    const status = document.getElementById('status');
+
+    // File upload handling
+    fileUploadArea.addEventListener('click', () => fileInput.click());
+
+    fileUploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      fileUploadArea.classList.add('dragover');
+    });
+
+    fileUploadArea.addEventListener('dragleave', () => {
+      fileUploadArea.classList.remove('dragover');
+    });
+
+    fileUploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      fileUploadArea.classList.remove('dragover');
+      const files = e.dataTransfer.files;
+      if (files.length && files[0].name.endsWith('.csv')) {
+        fileInput.files = files;
+        updateFileDisplay(files[0].name);
+      }
+    });
+
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length) {
+        updateFileDisplay(fileInput.files[0].name);
+      }
+    });
+
+    function updateFileDisplay(fileName) {
+      fileUploadArea.classList.add('has-file');
+      fileUploadArea.innerHTML = `<div class="file-name">📄 ${fileName}</div>`;
+    }
+
+    // CSV parsing with column normalization
+    const COLUMN_MAP = {
+      'keyword': 'keyword',
+      'keywords': 'keyword',
+      'negative keyword': 'keyword',
+      'negative keywords': 'keyword',
+      'negative_keyword': 'keyword',
+      'campaign': 'campaign',
+      'campaign name': 'campaign',
+      'campaign_name': 'campaign',
+      'match type': 'match_type',
+      'match_type': 'match_type',
+      'matchtype': 'match_type',
+      'type': 'match_type'
+    };
+
+    const REQUIRED_COLUMNS = ['keyword', 'campaign', 'match_type'];
+
+    function normalizeHeader(header) {
+      const cleaned = header.trim().toLowerCase();
+      return COLUMN_MAP[cleaned] || null;
+    }
+
+    function parseCSV(text) {
+      const lines = text.trim().split('\n');
+      if (lines.length < 2) return { data: [], missingColumns: REQUIRED_COLUMNS };
+
+      const rawHeaders = parseCSVLine(lines[0]);
+      const headerMapping = rawHeaders.map(h => normalizeHeader(h));
+      
+      // Check for missing required columns
+      const foundColumns = headerMapping.filter(h => h !== null);
+      const missingColumns = REQUIRED_COLUMNS.filter(col => !foundColumns.includes(col));
+      
+      if (missingColumns.length > 0) {
+        return { data: [], missingColumns };
+      }
+
+      const data = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const values = parseCSVLine(lines[i]);
+        const row = {};
+        
+        headerMapping.forEach((normalizedName, index) => {
+          if (normalizedName && values[index] !== undefined) {
+            row[normalizedName] = values[index].trim();
+          }
+        });
+        
+        // Only add rows that have all required fields
+        if (REQUIRED_COLUMNS.every(col => row[col])) {
+          data.push(row);
+        }
+      }
+
+      return { data, missingColumns: [] };
+    }
+
+    function parseCSVLine(line) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          result.push(current);
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      result.push(current);
+      return result;
+    }
+
+    // Form submission
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const webhookUrl = document.getElementById('webhookUrl').value.trim();
+      const clientName = document.getElementById('clientName').value.trim();
+      const instructions = document.getElementById('instructions').value.trim();
+      const file = fileInput.files[0];
+
+      if (!file) {
+        showStatus('Please upload a CSV file', 'error');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Processing...';
+
+      try {
+        const text = await file.text();
+        const { data: keywords, missingColumns } = parseCSV(text);
+
+        if (missingColumns.length > 0) {
+          throw new Error(`Missing required columns: ${missingColumns.join(', ')}`);
+        }
+
+        if (keywords.length === 0) {
+          throw new Error('No valid data rows found in CSV');
+        }
+
+        const payload = {
+          client_name: clientName,
+          keywords: keywords,
+          instructions: instructions || null,
+          submitted_at: new Date().toISOString(),
+          keyword_count: keywords.length
+        };
+
+        const response = await fetch(webhookUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          throw new Error(`Webhook returned ${response.status}`);
+        }
+
+        showStatus(`Submitted ${keywords.length} keywords for ${clientName}. Check Slack for results.`, 'success');
+
+      } catch (err) {
+        showStatus(`Error: ${err.message}`, 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit for Audit';
+      }
+    });
+
+    function showStatus(message, type) {
+      status.textContent = message;
+      status.className = `status ${type}`;
+    }
+  </script>
+</body>
+</html>
